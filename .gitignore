@@ -1,0 +1,139 @@
+# =============================================================
+# Python
+# =============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyd
+*.so
+*.pdb
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+MANIFEST
+
+# Test / type / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# =============================================================
+# Logs
+# =============================================================
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# =============================================================
+# Environment / Secrets — NEVER commit these
+# =============================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# =============================================================
+# IDE / Editor
+# =============================================================
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# =============================================================
+# SQLite database (runtime data — do not push)
+# =============================================================
+*.db
+*.sqlite
+*.sqlite3
+
+# =============================================================
+# Project-specific runtime / generated data
+# =============================================================
+
+# FAISS / vector index files
+*.index
+*.faiss
+faiss_index/
+**/faiss_index/
+
+# BM25 / Whoosh index
+whoosh_index/
+**/whoosh_index/
+bm25_index/
+**/bm25_index/
+
+# Qdrant on-disk storage
+qdrant_data/
+**/qdrant_data/
+qdrant_storage/
+**/qdrant_storage/
+
+# Corpus / dataset files (can be large)
+data/
+**/data/
+datasets/
+
+# Temporary upload staging
+temp_uploads/
+tmp/
+temp/
+*.tmp
+
+# Evaluation reports & results (machine-generated)
+evaluations/reports/
+evaluations/results/
+
+# =============================================================
+# Frontend — Next.js
+# =============================================================
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/node_modules/
+
+# Next.js cache
+frontend/.next/cache/
+
+# Auto-generated Next.js type declarations (re-created on build)
+frontend/next-env.d.ts
+
+# =============================================================
+# Jupyter / Notebooks
+# =============================================================
+.ipynb_checkpoints/
+*.ipynb
+
+# =============================================================
+# OS / Misc
+# =============================================================
+.cache/
+*.bak
+*.orig

@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Local env / secrets
+.env
+.env.*
+
+# Python caches / venvs
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Tests and local tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE/editor files
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local data (indexes, corpora, qdrant volumes)
+data/
+rag/data/
+**/data/
+whoosh_index/
+**/whoosh_index/
+qdrant_storage/
+**/qdrant_storage/
+
+# Docs / misc (optional)
+*.md
+docs/
