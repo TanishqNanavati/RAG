@@ -25,6 +25,7 @@ from app.services.routing.routing_service import RoutingService, RetrievalPipeli
 from app.reranking.reranker import CrossEncoderReRanker
 from src.generation.answer_generator import AnswerGenerator
 from src.evaluation.evaluator import SelfEvaluator
+from src.evaluation.models import EvaluationResult
 from app.services.orchestration.orchestrator import AdaptiveRAGOrchestrator
 
 logger = logging.getLogger(__name__)
@@ -127,6 +128,16 @@ class MessageResponse(BaseModel):
     role: str
     content: str
     created_at: str
+
+
+class SessionResponse(BaseModel):
+    id: str
+    title: Optional[str] = None
+    created_at: str
+
+
+class SessionUpdate(BaseModel):
+    title: str
 
 
 @router.post("/query", response_model=QueryResponse, summary="Execute Full RAG Pipeline")
@@ -250,17 +261,18 @@ async def execute_query(
 
 @router.get("/history/{session_id}", response_model=List[MessageResponse], summary="Retrieve Chat Session History")
 async def get_chat_history(
-    session_id: str, 
+    session_id: str,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Retrieves all chat messages for a specific conversation session."""
+    """Retrieves conversation history from SQLite."""
+    from app.models.chat import ChatSession
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
     if session and session.user_id:
         if not current_user or session.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized to view this session.")
-    
-    messages = conversation_manager.get_history(db, session_id, limit=50)
+            
+    history = conversation_manager.get_history(db, session_id, limit=50)
     return [
         MessageResponse(
             id=msg.id,
@@ -268,10 +280,52 @@ async def get_chat_history(
             content=msg.content,
             created_at=msg.created_at.isoformat()
         )
-        for msg in messages
+        for msg in history
     ]
 
 
+@router.get("/sessions", response_model=List[SessionResponse], summary="Retrieve User Chat Sessions")
+async def get_sessions(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Retrieve all chat sessions for the logged-in user."""
+    from app.models.chat import ChatSession
+    sessions = db.query(ChatSession).filter(ChatSession.user_id == current_user.id).order_by(ChatSession.created_at.desc()).all()
+    return [
+        SessionResponse(
+            id=s.id,
+            title=s.title,
+            created_at=s.created_at.isoformat()
+        )
+        for s in sessions
+    ]
+
+
+@router.put("/sessions/{session_id}", response_model=SessionResponse, summary="Rename Chat Session")
+async def update_session(
+    session_id: str,
+    update: SessionUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update the title of a chat session."""
+    from app.models.chat import ChatSession
+    session = db.query(ChatSession).filter(ChatSession.id == session_id, ChatSession.user_id == current_user.id).first()
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    session.title = update.title
+    db.commit()
+    db.refresh(session)
+    return SessionResponse(
+        id=session.id,
+        title=session.title,
+        created_at=session.created_at.isoformat()
+    )
+
+
+@router.post("/query/evaluation-only", response_model=EvaluationResult, summary="Run Evaluation Only")
 @router.post("/debug", response_model=DebugResponse, summary="Debugging Endpoint for Full RAG Pipeline")
 async def debug_query(request: QueryRequest) -> DebugResponse:
     if orchestrator is None:

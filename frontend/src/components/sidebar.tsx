@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, Search, FileUp, TrendingUp, Sparkles,
   LogOut, User as UserIcon
 } from "lucide-react";
+import { UserProfileModal } from "./user-profile-modal";
 
 interface SidebarProps {
   onOpenSettings: () => void;
@@ -30,6 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenSettings, onOpenDashboar
   const [searchTerm, setSearchTerm] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -255,22 +257,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenSettings, onOpenDashboar
 
         {/* User auth area */}
         {useChatStore.getState().user ? (
-          <div className="flex items-center gap-2 px-1">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] text-white shrink-0"
-              style={{ background: "linear-gradient(135deg,#6366f1,#3b82f6)" }}>
-              {useChatStore.getState().user?.username.substring(0,2).toUpperCase()}
-            </div>
-            <span className="text-[11px] font-medium text-zinc-300 truncate flex-1">
-              {useChatStore.getState().user?.username}
-            </span>
-            <button 
-              onClick={() => useChatStore.getState().logout()}
-              className="p-1.5 rounded-lg text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200"
-              title="Sign out"
+          <>
+            <div 
+              className="flex items-center gap-2 px-1 cursor-pointer hover:bg-white/5 rounded-xl py-1 transition-colors"
+              onClick={() => setIsProfileModalOpen(true)}
             >
-              <LogOut size={12} />
-            </button>
-          </div>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] text-white shrink-0"
+                style={{ background: "linear-gradient(135deg,#6366f1,#3b82f6)" }}>
+                {useChatStore.getState().user?.username.substring(0,2).toUpperCase()}
+              </div>
+              <span className="text-[11px] font-medium text-zinc-300 truncate flex-1">
+                {useChatStore.getState().user?.username}
+              </span>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  useChatStore.getState().logout();
+                }}
+                className="p-1.5 rounded-lg text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-200"
+                title="Sign out"
+              >
+                <LogOut size={12} />
+              </button>
+            </div>
+            {isProfileModalOpen && (
+              <UserProfileModal onClose={() => setIsProfileModalOpen(false)} />
+            )}
+          </>
         ) : (
           <button 
             onClick={() => useChatStore.getState().setAuthModalOpen(true)}

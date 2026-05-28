@@ -18,8 +18,14 @@ export interface DocumentInfo {
   uploadedAt: string;
 }
 
+interface User {
+  id: number;
+  username: string;
+  created_at?: string;
+}
+
 interface ChatState {
-  user: { id: number, username: string } | null;
+  user: User | null;
   sessions: ChatSession[];
   currentSessionId: string | null;
   messages: ChatMessage[];
@@ -107,6 +113,24 @@ export const useChatStore = create<ChatState>()(
         try {
           const user = await api.getMe();
           set({ user });
+          
+          try {
+            const sessions = await api.getSessions();
+            if (sessions && sessions.length > 0) {
+              set({ 
+                sessions: sessions.map((s: any) => ({
+                  id: s.id,
+                  title: s.title || `Chat ${s.id.substring(0,8)}`,
+                  isCustomTitle: !!s.title,
+                  created_at: s.created_at
+                })),
+                currentSessionId: sessions[0].id
+              });
+              await get().selectSession(sessions[0].id);
+            }
+          } catch (e) {
+            console.error("Failed to fetch sessions", e);
+          }
         } catch {
           set({ user: null });
         }
@@ -181,6 +205,12 @@ export const useChatStore = create<ChatState>()(
             s.id === id ? { ...s, title, isCustomTitle: isCustom } : s
           )
         }));
+        
+        // Background sync to backend
+        const { user } = get();
+        if (user) {
+          api.renameSession(id, title).catch(e => console.error("Failed to rename session on backend", e));
+        }
       },
       
       sendMessage: async (text: string, strategy?: string) => {

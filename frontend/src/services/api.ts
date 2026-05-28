@@ -150,6 +150,47 @@ export const api = {
   },
 
   /**
+   * Fetch All User Sessions
+   */
+  async getSessions(): Promise<any[]> {
+    const response = await fetch(`${API_BASE_URL}/sessions`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to load chat sessions.");
+    }
+    return response.json();
+  },
+
+  /**
+   * Fetch User Stats
+   */
+  async getUserStats(): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/auth/me/stats`, {
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to load user stats.");
+    }
+    return response.json();
+  },
+
+  /**
+   * Rename User Session
+   */
+  async renameSession(sessionId: string, title: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+      method: "PUT",
+      headers: this.getHeaders(),
+      body: JSON.stringify({ title }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to rename chat session.");
+    }
+    return response.json();
+  },
+
+  /**
    * Ingest and Index Document
    * We use the Hybrid indexing endpoint to add it to both stores!
    */
