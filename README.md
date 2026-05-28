@@ -122,6 +122,23 @@ chmod +x run.sh
 
 ---
 
+## 🐳 Docker Deployment
+
+The entire stack (Frontend, Backend, Qdrant, Redis) is fully dockerized for easy production deployment.
+
+```bash
+# Build and start all services in detached mode
+docker compose -f docker-compose.prod.yml up -d --build
+
+# View logs
+docker compose -f docker-compose.prod.yml logs -f
+
+# Stop services
+docker compose -f docker-compose.prod.yml down
+```
+
+---
+
 ## 🛠 Development
 
 ```bash
