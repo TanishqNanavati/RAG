@@ -77,44 +77,6 @@ SelfEvaluator (Faithfulness + Citation Score)
 | LLM | Gemini via OpenAI-compatible API |
 | Frontend | Next.js 15, TypeScript, Tailwind CSS, Zustand |
 
----
-
-## 📦 Project Structure
-
-```
-rag/
-├── app/
-│   ├── main.py                      # FastAPI entrypoint & lifecycle
-│   ├── api/
-│   │   ├── auth_routes.py           # /register, /login, /me, /me/stats
-│   │   ├── orchestration_routes.py  # /query, /sessions, /history
-│   │   └── ingestion_routes.py      # /ingest
-│   ├── core/                        # config.py, db.py, security.py
-│   ├── models/                      # User, ChatSession, ChatMessage
-│   └── services/
-│       ├── orchestration/           # AdaptiveRAGOrchestrator, ConversationManager
-│       ├── dense_retrieval/         # Qdrant embedding + vector search
-│       ├── bm25_retrieval/          # BM25Okapi sparse retrieval
-│       ├── hybrid_retrieval/        # RRF score fusion
-│       ├── routing/                 # Strategy router + RetrievalPipeline
-│       └── cache/                   # RedisSemanticCache
-├── src/
-│   ├── generation/                  # AnswerGenerator + prompt templates
-│   └── evaluation/                  # SelfEvaluator (LLM-as-a-judge)
-├── frontend/
-│   └── src/
-│       ├── components/              # Sidebar, ChatArea, ContextPanel, etc.
-│       ├── store/useChatStore.ts    # Zustand global state
-│       └── services/api.ts          # All backend API calls
-├── scripts/                         # CLI test scripts
-├── docker-compose.yml               # Qdrant + Redis services
-├── requirements.txt
-├── .env.example                     # Environment variable template
-└── run.sh                           # One-command startup script
-```
-
----
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -157,52 +119,6 @@ chmod +x run.sh
 
 > **Note:** `run.sh` automatically starts Docker (Qdrant + Redis), the FastAPI backend with hot-reload, and the Next.js dev server.
 
----
-
-## ⚙️ Environment Variables
-
-Copy `.env.example` to `.env` and fill in the required values:
-
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `GEMINI_API_KEY` | ✅ | — | Gemini API key |
-| `JWT_SECRET` | ✅ | — | JWT signing secret (generate a random hex) |
-| `GEMINI_MODEL` | | `gemini-2.0-flash` | LLM model name |
-| `OPENAI_BASE_URL` | | Gemini endpoint | OpenAI-compatible base URL |
-| `QDRANT_URL` | | `http://localhost:6333` | Qdrant vector DB URL |
-| `QDRANT_COLLECTION` | | `rag_chunks` | Collection name |
-| `REDIS_HOST` | | `localhost` | Redis host |
-| `DATABASE_URL` | | `sqlite:///./rag.db` | Database path |
-| `EMBEDDING_MODEL` | | `all-MiniLM-L6-v2` | Sentence transformer model |
-| `RERANK_MODEL` | | `cross-encoder/ms-marco-MiniLM-L-6-v2` | CrossEncoder reranker |
-
----
-
-## 🔌 API Reference
-
-> Full interactive docs at `http://localhost:8000/docs`
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/api/v1/auth/register` | — | Register new user |
-| `POST` | `/api/v1/auth/login` | — | Login, returns JWT token |
-| `GET` | `/api/v1/auth/me` | 🔒 | Current user info |
-| `GET` | `/api/v1/auth/me/stats` | 🔒 | User query & RAG statistics |
-| `POST` | `/api/v1/ingest` | 🔒 | Upload & index a document |
-| `POST` | `/api/v1/query` | 🔒 | Run RAG query (`strategy`: `bm25`/`dense`/`hybrid`/`auto`) |
-| `GET` | `/api/v1/sessions` | 🔒 | List all user's chat sessions |
-| `PUT` | `/api/v1/sessions/{id}` | 🔒 | Rename a session |
-| `GET` | `/api/v1/history/{session_id}` | 🔒 | Get messages for a session |
-| `POST` | `/api/v1/compare` | 🔒 | Compare strategies on a single query |
-
-**Query payload example:**
-```json
-{
-  "query": "What is Node.js?",
-  "session_id": "session_abc123",
-  "strategy": "hybrid"
-}
-```
 
 ---
 
