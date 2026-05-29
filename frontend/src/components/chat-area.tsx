@@ -3,7 +3,7 @@ import { useChatStore } from "../store/useChatStore";
 import { 
   Send, Sparkles, AlertCircle, Copy, Check, ThumbsUp, ThumbsDown, 
   Plus, FileText, User, Database, ChevronRight, MessageSquare, Activity,
-  Loader2, Zap
+  Loader2, Zap, Edit2
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -136,7 +136,7 @@ export const ChatArea: React.FC = () => {
           return (
             <div 
               key={msg.id}
-              className={`flex gap-3 max-w-3xl animate-slide-up w-full ${
+              className={`group flex gap-3 max-w-3xl animate-slide-up w-full ${
                 isUser ? "ml-auto flex-row-reverse" : "mr-auto"
               }`}
             >
@@ -204,42 +204,78 @@ export const ChatArea: React.FC = () => {
                   )}
                 </div>
 
-                {/* Diagnostics bar */}
-                {!isUser && metadata && (
+                {/* User actions */}
+                {isUser && (
+                  <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end px-1" style={{ transitionDelay: "100ms" }}>
+                    <button 
+                      onClick={() => copyToClipboard(msg.content, msg.id)}
+                      className="p-1.5 rounded-lg text-zinc-500 hover:text-indigo-300 hover:bg-white/5 transition-all duration-150"
+                      title="Copy"
+                    >
+                      {copiedId === msg.id ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setInput(msg.content);
+                        if (textareaRef.current) {
+                          textareaRef.current.focus();
+                          // Small timeout to allow state to update before calculating height
+                          setTimeout(() => {
+                            if (textareaRef.current) {
+                              textareaRef.current.style.height = "auto";
+                              textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 160) + "px";
+                            }
+                          }, 10);
+                        }
+                      }}
+                      className="p-1.5 rounded-lg text-zinc-500 hover:text-indigo-300 hover:bg-white/5 transition-all duration-150"
+                      title="Edit (copies to input)"
+                    >
+                      <Edit2 size={11} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Diagnostics & Action bar (Assistant) */}
+                {!isUser && (
                   <div className="flex flex-wrap items-center gap-2 px-0.5 text-[10px]">
-                    <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider font-mono ${
-                      metadata.is_cached 
-                        ? "text-emerald-400" 
-                        : "text-amber-500"
-                    }`} style={metadata.is_cached
-                      ? { background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }
-                      : { background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }
-                    }>
-                      {metadata.is_cached ? "⚡ Cache Hit" : "◈ Cache Miss"}
-                    </span>
+                    {metadata && (
+                      <>
+                        <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] uppercase font-bold tracking-wider font-mono ${
+                          metadata.is_cached 
+                            ? "text-emerald-400" 
+                            : "text-amber-500"
+                        }`} style={metadata.is_cached
+                          ? { background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }
+                          : { background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }
+                        }>
+                          {metadata.is_cached ? "⚡ Cache Hit" : "◈ Cache Miss"}
+                        </span>
 
-                    <span className="text-zinc-600 font-mono">
-                      {metadata.metadata.latencies.total_ms}ms
-                    </span>
+                        <span className="text-zinc-600 font-mono">
+                          {metadata.metadata.latencies.total_ms}ms
+                        </span>
 
-                    <button 
-                      onClick={() => setSelectedRAGDetail(metadata)}
-                      className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
-                    >
-                      View Sources ({Object.keys(metadata.citations).length})
-                      <ChevronRight size={10} />
-                    </button>
-                    
-                    <button 
-                      onClick={() => { setSelectedRAGDetail(metadata); setStrategyAnalysisOpen(true); }}
-                      className="flex items-center gap-1 font-semibold transition-colors"
-                      style={{ color: "#fbbf24" }}
-                    >
-                      Analysis
-                      <Activity size={10} />
-                    </button>
+                        <button 
+                          onClick={() => setSelectedRAGDetail(metadata)}
+                          className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+                        >
+                          View Sources ({Object.keys(metadata.citations).length})
+                          <ChevronRight size={10} />
+                        </button>
+                        
+                        <button 
+                          onClick={() => { setSelectedRAGDetail(metadata); setStrategyAnalysisOpen(true); }}
+                          className="flex items-center gap-1 font-semibold transition-colors"
+                          style={{ color: "#fbbf24" }}
+                        >
+                          Analysis
+                          <Activity size={10} />
+                        </button>
+                      </>
+                    )}
 
-                    <div className="flex items-center gap-1 ml-auto" style={{ borderLeft: "1px solid var(--border)", paddingLeft: "10px" }}>
+                    <div className="flex items-center gap-1 ml-auto" style={{ borderLeft: metadata ? "1px solid var(--border)" : "none", paddingLeft: metadata ? "10px" : "0" }}>
                       <button 
                         onClick={() => copyToClipboard(msg.content, msg.id)}
                         className="p-1 rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-white/5 transition-all duration-150"
