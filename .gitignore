@@ -147,3 +147,5 @@ chat_history.db
 chathistory.db
 qdrant-data/
 evaluations/
+
+docker-compose.prod.yml
