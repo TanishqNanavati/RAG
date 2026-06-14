@@ -48,10 +48,10 @@ async def ingest_document(
     
     # Validate extension
     ext = os.path.splitext(file.filename or "")[1].lower()
-    if ext not in [".pdf", ".txt", ".md", ".markdown"]:
+    if ext not in [".pdf", ".txt", ".md", ".markdown", ".docx", ".pptx"]:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type '{ext}'. Supported formats: PDF, TXT, MD."
+            detail=f"Unsupported file type '{ext}'. Supported formats: PDF, TXT, MD, DOCX, PPTX."
         )
 
     # Create temporary staging directory inside workspace

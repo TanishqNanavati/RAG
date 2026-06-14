@@ -138,7 +138,7 @@ class DocumentLoader:
                 if not text:
                     continue
                     
-                if para.style.name.startswith('Heading'):
+                if getattr(para.style, 'name', '').startswith('Heading'):
                     if buffer:
                         loaded_page = LoadedPage(text="\n".join(buffer), page_number=page_num, section_title=section_title)
                         yield StreamedPage(source=source, document_type=doc_type, page=loaded_page)
