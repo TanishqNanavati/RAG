@@ -143,7 +143,6 @@ frontend/next-env.d.ts
 # =============================================================
 src/
 scripts/
-docker-compose.yml
 chat_history.db
 chathistory.db
 qdrant-data/
