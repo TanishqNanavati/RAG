@@ -1,3 +1,0 @@
-"""
-Offline Evaluation Benchmark Package.
-"""
