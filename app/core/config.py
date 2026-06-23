@@ -36,8 +36,8 @@ class Settings(BaseSettings):
     rerank_top_n: int = 30
     fusion_w_dense: float = 0.6
     fusion_w_bm25: float = 0.4
-    min_rerank_score: float = -4.0
-    min_avg_rerank_score: float = -6.0
+    min_rerank_score: float = 0.0001
+    min_avg_rerank_score: float = 0.00001
 
     # Self-eval / retry loop config
     max_rag_rounds: int = 2

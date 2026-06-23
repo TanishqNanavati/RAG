@@ -31,7 +31,12 @@ class CrossEncoderReRanker(BaseReRanker):
         logger.info(f"Initializing CrossEncoder reranker with model: {self.model_name} on device: {self.device}")
         
         try:
-            self.model = CrossEncoder(self.model_name, device=self.device)
+            import torch
+            self.model = CrossEncoder(
+                self.model_name, 
+                device=self.device, 
+                default_activation_function=torch.nn.Sigmoid()
+            )
             logger.info("CrossEncoder reranker initialized successfully.")
         except Exception as e:
             logger.error(f"Failed to load CrossEncoder model '{self.model_name}': {e}")
