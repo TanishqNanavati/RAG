@@ -53,9 +53,6 @@ class TextChunker:
         last_page_context = None
 
         for streamed_page in page_stream:
-            # FIX: Enforce Strict Page Boundaries
-            # Flush the buffer immediately when transitioning to a new page
-            # to prevent distinct facts from different pages bleeding into the same chunk.
             if current_chunk_sentences and last_page_context:
                 chunk_text = " ".join(current_chunk_sentences)
                 chunk_id = self._generate_chunk_id(last_page_context.source, chunk_index, chunk_text)
