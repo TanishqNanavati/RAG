@@ -141,7 +141,6 @@ frontend/next-env.d.ts
 # =============================================================
 # User Requested Ignores
 # =============================================================
-src/
 scripts/
 chat_history.db
 chathistory.db
