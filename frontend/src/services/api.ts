@@ -150,6 +150,20 @@ export const api = {
   },
 
   /**
+   * Delete User Session
+   */
+  async deleteSession(sessionId: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+      method: "DELETE",
+      headers: this.getHeaders(),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete chat session.");
+    }
+    return response.json();
+  },
+
+  /**
    * Fetch All User Sessions
    */
   async getSessions(): Promise<any[]> {

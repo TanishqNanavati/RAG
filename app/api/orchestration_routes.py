@@ -382,3 +382,28 @@ async def debug_query(request: QueryRequest) -> DebugResponse:
     except Exception as e:
         logger.error(f"Debug pipeline failed: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@router.delete("/sessions/{session_id}", summary="Delete Chat Session")
+async def delete_session(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Deletes a chat session and all its messages."""
+    from app.models.chat import ChatSession, ChatMessage
+    session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found.")
+        
+    if session.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this session.")
+        
+    # Delete associated messages
+    db.query(ChatMessage).filter(ChatMessage.session_id == session_id).delete()
+    
+    # Delete session
+    db.delete(session)
+    db.commit()
+    
+    return {"status": "success", "message": "Session deleted"}

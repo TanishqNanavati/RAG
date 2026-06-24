@@ -66,7 +66,7 @@ interface ChatState {
   initChat: () => Promise<void>;
   createSession: (title?: string) => string;
   selectSession: (id: string) => Promise<void>;
-  deleteSession: (id: string) => void;
+  deleteSession: (id: string) => Promise<void>;
   renameSession: (id: string, title: string, isCustom?: boolean) => void;
   
   sendMessage: (text: string, strategy?: string) => Promise<void>;
@@ -180,7 +180,12 @@ export const useChatStore = create<ChatState>()(
         }
       },
       
-      deleteSession: (id) => {
+      deleteSession: async (id) => {
+        try {
+          await api.deleteSession(id);
+        } catch (e) {
+          console.error("Failed to delete session on backend", e);
+        }
         set(state => {
           const newSessions = state.sessions.filter(s => s.id !== id);
           let newActive = state.currentSessionId;

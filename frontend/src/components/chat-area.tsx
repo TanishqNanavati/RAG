@@ -283,12 +283,6 @@ export const ChatArea: React.FC = () => {
                       >
                         {copiedId === msg.id ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
                       </button>
-                      <button className="p-1 rounded-lg text-zinc-600 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-150">
-                        <ThumbsUp size={11} />
-                      </button>
-                      <button className="p-1 rounded-lg text-zinc-600 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-150">
-                        <ThumbsDown size={11} />
-                      </button>
                     </div>
                   </div>
                 )}
